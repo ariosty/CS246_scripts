@@ -14,9 +14,9 @@ do
     error=0
     ls "$arg_file" >/dev/null 2>/dev/null
     if [ $? -ne 0 ]; then
-        str=`valgrind "$2" <"$in_file" 2>&1 >/dev/null | tail -1 | egrep -o [0-9]*`
+        str=`valgrind "$2" <"$in_file" 2>&1 >/dev/null | tail -1 | egrep -o [0-9]+`
     else
-        str=`valgrind "$2" $(cat "$args_file") <"$in_file" 2>&1 >/dev/null | tail -1 | egrep -o [0-9]*`
+        str=`valgrind "$2" $(cat "$arg_file") <"$in_file" 2>&1 >/dev/null | tail -1 | egrep -o [0-9]+`
     fi
     error=`echo $str | cut -d \  -f2`
     sum=$((sum+error))
