@@ -8,9 +8,9 @@ fi
 sum=0
 while read line
 do
-    in_file=$line".in"
-    arg_file=$line".args"
-    out_file=$line".out"
+    in_file="./"$line".in"
+    arg_file="./"$line".args"
+    out_file="./"$line".out"
     error=0
     ls "$arg_file" >/dev/null 2>/dev/null
     if [ $? -ne 0 ]; then

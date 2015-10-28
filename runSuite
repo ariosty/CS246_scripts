@@ -1,0 +1,50 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+    echo "error: expected 2 arguments, given" $# 1>&2
+    exit 1
+fi
+while read line
+do
+    in_file="./"$line".in"
+    arg_file="./"$line".args"
+    temp_file=$(mktemp)
+    out_file="./"$line$".out"
+    ls "$in_file" > /dev/null 2> /dev/null
+    if [ $? -ne 0 ]; then
+        echo "error:" $line".in missing or unreadable" 1>&2
+        exit 2 
+    fi
+    ls "$out_file" > /dev/null 2> /dev/null
+    if [ $? -ne 0 ]; then
+        echo "error:" $line".in missing or unreadable" 1>&2
+        exit 2 
+    fi
+    ls "$arg_file" > /dev/null 2> /dev/null
+    if [ $? -ne 0 ]; then
+        $2 < "$in_file" > "$temp_file"
+    else
+        $2 $(cat "$arg_file") < "$in_file" > "$temp_file"
+    fi
+    #echo "in: " $(cat "$in_file")
+    #echo "out: " $(cat "$temp_file")
+    #echo "expected: " $(cat "$out_file")
+    diff "$temp_file" "$out_file" > /dev/null 2> /dev/null
+    diff_status=$?
+    if [ $diff_status -eq 2 ]; then
+        echo "error: "$line".in and/or" $line".out missing or unreadable" 1>&2
+        exit 2
+    elif [ $diff_status -eq 1 ]; then
+        echo "Test failed: "$line
+        echo "Input:"
+        cat "$in_file"
+        echo "============================================================"
+        echo "Expected:"
+        cat "$out_file"
+        echo "============================================================"
+        echo "Actual:"
+        cat "$temp_file"
+    fi
+    rm "$temp_file"
+#    echo $line
+done <$1
